@@ -4,6 +4,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Kafka.Extensions.Hosting</PackageId>
+    <Authors>Michael (Enzian) Ingold</Authors>
+    <Company>Leuchter AG</Company>
+    <Product>Kafka.Extensions.Hosting</Product>
+    <PackageTags>Kafka, Hosting</PackageTags>
+    <RepositoryUrl>https://github.com/leuchterag/Microsoft.Extensions.Hosting.Kafka</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
