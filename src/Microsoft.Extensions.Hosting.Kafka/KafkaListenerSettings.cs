@@ -29,10 +29,10 @@ namespace Microsoft.Extensions.Hosting.Kafka
             }
         }
 
-        public int? AutoCommitIntervall
+        public int? AutoCommitIntervallMs
         {
-            get => this["enable.auto.commit"] as int?;
-            set => this["enable.auto.commit"] = value;
+            get => this["auto.commit.interval.ms"] as int?;
+            set => this["auto.commit.interval.ms"] = value;
         }
 
         public IEnumerable<string> BootstrapServers
