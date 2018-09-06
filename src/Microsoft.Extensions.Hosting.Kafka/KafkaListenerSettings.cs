@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
             }
         }
 
-        public int? AutoCommitIntervall
+        public int? AutoCommitIntervallMs
         {
             get => this["auto.commit.interval.ms"] as int?;
             set => this["auto.commit.interval.ms"] = value;
