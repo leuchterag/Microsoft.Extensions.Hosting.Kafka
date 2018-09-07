@@ -88,7 +88,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
                         using (var scope = serviceProvider.CreateScope())
                         {
-                            var handler = scope.ServiceProvider.GetService<IMessageHandler<TKey, TValue>>();
+                            var handler = scope.ServiceProvider.GetService<IKafkaMessageHandler<TKey, TValue>>();
                             if (handler == null)
                             {
                                 logger.LogError("Failed to resolve message handler. Did you add it to your DI setup.");
@@ -97,7 +97,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
                             try
                             {
                                 // Invoke the handler
-                                await handler.Handle(msg.Key, msg.Value);
+                                await handler.Handle(msg);
                             }
                             catch (Exception e)
                             {

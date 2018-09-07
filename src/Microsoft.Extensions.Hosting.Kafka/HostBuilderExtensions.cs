@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.Hosting
             hostBuilder.ConfigureServices(
                 (hostCtx, container) =>
                 {
+                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<TKey, TMessage>), typeof(ForwardingKafkaMessageHandler<TKey, TMessage>), ServiceLifetime.Scoped));
                     container.Add(new ServiceDescriptor(typeof(IHostedService), typeof(KafkaListenerService<TKey, TMessage>), ServiceLifetime.Singleton));
                     container.Configure<KafkaListenerSettings>(configureDelegate);
                 });

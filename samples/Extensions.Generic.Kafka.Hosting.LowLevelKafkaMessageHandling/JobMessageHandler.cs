@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
-using System.Text;
+using System;
 using System.Threading.Tasks;
 
-namespace Extensions.Generic.Kafka.Hosting.Sample
+namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 {
-    class JobMessageHandler : IMessageHandler<string, byte[]>
+    class JobMessageHandler : IMessageHandler<DateTimeOffset, string>
     {
         readonly ILogger logger;
 
@@ -14,9 +14,9 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
             this.logger = logger;
         }
 
-        public async Task Handle(string key, byte[] value)
+        public async Task Handle(DateTimeOffset key, string value)
         {
-            logger.LogInformation($"Received message from Kafka:\n{Encoding.UTF8.GetString(value)}");
+            logger.LogInformation($"Received message from Kafka:\n{value}");
         }
     }
 }

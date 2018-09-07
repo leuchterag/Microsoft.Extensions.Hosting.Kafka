@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		version.props = version.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling", "samples\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling.csproj", "{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,18 @@ Global
 		{1EABE3AA-F1C7-4A12-AF9C-4BCFE9D842B9}.Release|x64.Build.0 = Release|Any CPU
 		{1EABE3AA-F1C7-4A12-AF9C-4BCFE9D842B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EABE3AA-F1C7-4A12-AF9C-4BCFE9D842B9}.Release|x86.Build.0 = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|x64.Build.0 = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +86,7 @@ Global
 		{E167510C-849D-4882-959F-E523E824A6D9} = {0879DB81-B58E-4F5F-91F2-9E47B0307174}
 		{4FC61656-12AB-424A-813F-01C220D33118} = {F6145EBE-640C-42D1-B890-D76D3716912E}
 		{1EABE3AA-F1C7-4A12-AF9C-4BCFE9D842B9} = {F6145EBE-640C-42D1-B890-D76D3716912E}
+		{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348} = {F6145EBE-640C-42D1-B890-D76D3716912E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A5FB2C0-313F-43E0-8B3A-FC63F7429784}
