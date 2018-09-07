@@ -10,6 +10,9 @@ namespace Microsoft.Extensions.Hosting.Kafka
             set => this["group.id"] = value;
         }
 
+        /// <summary>
+        /// Enable or disable Autocommit
+        /// </summary>
         public bool IsAutocommitEnabled
         {
             get
@@ -29,12 +32,18 @@ namespace Microsoft.Extensions.Hosting.Kafka
             }
         }
 
+        /// <summary>
+        /// Auto commit intervall in ms
+        /// </summary>
         public int? AutoCommitIntervall
         {
-            get => this["enable.auto.commit"] as int?;
-            set => this["enable.auto.commit"] = value;
+            get => this["auto.commit.interval.ms"] as int?;
+            set => this["auto.commit.interval.ms"] = value;
         }
 
+        /// <summary>
+        /// Comma separated list of bootstrap servers.
+        /// </summary>
         public IEnumerable<string> BootstrapServers
         {
             get
