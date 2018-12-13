@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
         readonly IServiceProvider serviceProvider;
         readonly IOptions<KafkaListenerSettings> listenerSettings;
         readonly ILogger logger;
+        readonly CancellationTokenSource terminationTokenSource = new CancellationTokenSource();
 
         public KafkaListenerService(
             IDeserializer<TKey> keyDeserializer,
@@ -79,7 +80,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
             listener = Task.Run(async () =>
             {
-                while (!cancellationToken.IsCancellationRequested)
+                while (!terminationTokenSource.Token.IsCancellationRequested)
                 {
                     consumer.Consume(out var msg, TimeSpan.FromSeconds(1));
                     if (msg != null)
@@ -118,6 +119,8 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
+            terminationTokenSource.Cancel();
+            
             var awaitForceShutdown = Task.Run(() => cancellationToken.WaitHandle.WaitOne());
 
             if (await Task.WhenAny(listener, awaitForceShutdown) == awaitForceShutdown)
