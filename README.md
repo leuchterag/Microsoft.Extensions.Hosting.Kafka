@@ -72,3 +72,26 @@ class JobMessageHandler : IMessageHandler<string, byte[]>
     }
 }
 ```
+
+
+### Development
+#### Development Kafka Instance
+
+Start a standalone installation of Kafka:
+
+```
+docker run -d -e ADVERTISED_HOSTNAME=$(hostname -f) -p 9092:9092 -p 2181:2181 jrottenberg/kafka-standalone
+```
+
+Exec into the container and start a shell:
+
+```
+$ docker exec -it <containerid> bash
+/kafka# cd usr/bin
+/usr/bin# ./kafka-console-producer --broker-list broker:9092 --topic topic1
+
+[enter multiple mesages]
+
+``` 
+
+Run one of the samples and check if they receive messages.

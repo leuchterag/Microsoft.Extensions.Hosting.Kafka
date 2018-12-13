@@ -29,7 +29,7 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
                     container.Configure<KafkaListenerSettings>(config =>
                     {
 
-                        config.BootstrapServers = new[] { "kafka:9092" };
+                        config.BootstrapServers = new[] { "localhost:29092" };
                         config.Topics = new[] { "topic1" };
                         config.ConsumerGroup = "group1";
                         config.DefaultTopicConfig = new Dictionary<string, object>
