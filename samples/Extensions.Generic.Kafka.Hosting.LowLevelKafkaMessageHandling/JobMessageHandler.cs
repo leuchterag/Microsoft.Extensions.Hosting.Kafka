@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 {
-    class JobMessageHandler : IMessageHandler<DateTimeOffset, string>
+    class JobMessageHandler : IMessageHandler<string, JObject>
     {
         readonly ILogger logger;
 
@@ -14,9 +15,9 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
             this.logger = logger;
         }
 
-        public Task Handle(DateTimeOffset key, string value)
+        public Task Handle(string key, JObject value)
         {
-            logger.LogInformation($"Received message from Kafka:\n{value}");
+            logger.LogInformation($"Received message from Kafka: {key} \n{value.ToString()}");
             return Task.CompletedTask;
         }
     }

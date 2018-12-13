@@ -40,6 +40,8 @@ namespace Microsoft.Extensions.Hosting
 
         public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate)
         {
+            hostBuilder.UseKafka<string, byte[]>();
+
             hostBuilder.ConfigureServices(
                 (hostCtx, container) =>
                 {
@@ -48,8 +50,6 @@ namespace Microsoft.Extensions.Hosting
 
                     container.Configure(configureDelegate);
                 });
-
-            hostBuilder.UseKafka<string, byte[]>();
 
             return hostBuilder;
         }
