@@ -14,9 +14,10 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
             this.logger = logger;
         }
 
-        public async Task Handle(string key, byte[] value)
+        public Task Handle(string key, byte[] value)
         {
-            logger.LogInformation($"Received message from Kafka:\n{Encoding.UTF8.GetString(value)}");
+            logger.LogInformation($"Received message from Kafka {key} : {Encoding.UTF8.GetString(value)}");
+            return Task.CompletedTask;
         }
     }
 }

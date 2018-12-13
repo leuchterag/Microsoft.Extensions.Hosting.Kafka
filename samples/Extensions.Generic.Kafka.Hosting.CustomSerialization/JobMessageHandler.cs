@@ -14,9 +14,10 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
             this.logger = logger;
         }
 
-        public async Task Handle(DateTimeOffset key, string value)
+        public Task Handle(DateTimeOffset key, string value)
         {
             logger.LogInformation("Received message from Kafka");
+            return Task.CompletedTask;
         }
     }
 }
