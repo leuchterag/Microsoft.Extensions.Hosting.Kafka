@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,34 +20,31 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                 .UseConsoleLifetime()
                 .ConfigureAppConfiguration((hostContext, configApp) =>
                 {
-                    hostContext.HostingEnvironment.ApplicationName = "Sample Hostbuilder Kafka Consumer Sample";
+                    hostContext.HostingEnvironment.ApplicationName = "Sample Hostbuilder Kafka Lowlevel Consumer";
                     hostContext.HostingEnvironment.ContentRootPath = Directory.GetCurrentDirectory();
                 })
-                .UseKafka<DateTimeOffset, string>(config =>
+                .UseKafka(config => 
                 {
-
-                    config.BootstrapServers = new[] { "kafka:9092" };
+                    // Configuration for the kafka consumer
+                    config.BootstrapServers = new[] { "localhost:29092" };
                     config.Topics = new[] { "topic1" };
                     config.ConsumerGroup = "group1";
                     config.DefaultTopicConfig = new Dictionary<string, object>
-                        {
-                            { "auto.offset.reset", "smallest" }
-                        };
-                }) // Equivalent to .UseKafka<string, byte[]>()
+                    {
+                        { "auto.offset.reset", "smallest" }
+                    };
+                })
                 .ConfigureServices(container =>
                 {
                     // The message that matches the
-                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<string, byte[]>), typeof(CustomKafkaMessageHandler<string, byte[]>), ServiceLifetime.Singleton));
-                    container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, byte[]>), typeof(JobMessageHandler), ServiceLifetime.Singleton));
+                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<string, byte[]>), typeof(CustomKafkaMessageHandler), ServiceLifetime.Scoped));
+                    container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, JObject>), typeof(JobMessageHandler), ServiceLifetime.Scoped));
 
-                    // Add the necessary serializers into DI!
-                    container.Add(new ServiceDescriptor(typeof(IDeserializer<string>), new StringDeserializer(Encoding.UTF8)));
-                    container.Add(new ServiceDescriptor(typeof(IDeserializer<DateTimeOffset>), typeof(DatetimeDeserializer), ServiceLifetime.Singleton));
+                    
                 })
                 .ConfigureLogging((ILoggingBuilder loggingBuilder) =>
                 {
                     loggingBuilder.AddConsole();
-                    loggingBuilder.AddDebug();
                 })
                 .Build();
 

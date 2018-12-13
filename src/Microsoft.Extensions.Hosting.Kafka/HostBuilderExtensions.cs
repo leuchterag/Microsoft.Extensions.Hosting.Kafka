@@ -40,16 +40,14 @@ namespace Microsoft.Extensions.Hosting
 
         public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate)
         {
+            hostBuilder.UseKafka<string, byte[]>(configureDelegate);
+
             hostBuilder.ConfigureServices(
                 (hostCtx, container) =>
                 {
                     container.Add(new ServiceDescriptor(typeof(IDeserializer<string>), new StringDeserializer(Encoding.UTF8)));
                     container.Add(new ServiceDescriptor(typeof(IDeserializer<byte[]>), typeof(ByteArrayDeserializer), ServiceLifetime.Singleton));
-
-                    container.Configure(configureDelegate);
                 });
-
-            hostBuilder.UseKafka<string, byte[]>();
 
             return hostBuilder;
         }

@@ -1,25 +1,37 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 {
-    class CustomKafkaMessageHandler<TKey, TMessage> : IKafkaMessageHandler<TKey, TMessage>
+    class CustomKafkaMessageHandler : IKafkaMessageHandler<string, byte[]>
     {
-        readonly IMessageHandler<TKey, TMessage> messageHandler;
+        readonly IMessageHandler<string, JObject> messageHandler;
         readonly ILogger logger;
 
-        public CustomKafkaMessageHandler(IMessageHandler<TKey, TMessage> messageHandler, ILogger<CustomKafkaMessageHandler<TKey, TMessage>> logger)
+        public CustomKafkaMessageHandler(IMessageHandler<string, JObject> messageHandler, ILogger<CustomKafkaMessageHandler> logger)
         {
             this.messageHandler = messageHandler;
             this.logger = logger;
         }
 
-        public Task Handle(Message<TKey, TMessage> message)
+        public async Task Handle(Message<string, byte[]> message)
         {
             logger.LogInformation($"Handling message from Kafka at offset: {message.Offset}");
-            return messageHandler.Handle(message.Key, message.Value);
+            using (var stream = new MemoryStream(message.Value))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                var content = await reader.ReadToEndAsync();
+                var obj = JObject.Parse(content);
+
+                await messageHandler.Handle(message.Key, obj);
+            }
         }
     }
 }
