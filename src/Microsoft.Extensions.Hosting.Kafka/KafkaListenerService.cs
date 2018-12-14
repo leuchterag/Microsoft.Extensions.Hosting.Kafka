@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.Hosting.Kafka
 {
-    class KafkaListenerService<TKey, TValue> : IHostedService
+    class KafkaListenerService<TKey, TValue> : BackgroundService
     {
         Consumer<TKey, TValue> consumer;
         Task listener;
@@ -19,7 +19,6 @@ namespace Microsoft.Extensions.Hosting.Kafka
         readonly IServiceProvider serviceProvider;
         readonly IOptions<KafkaListenerSettings> listenerSettings;
         readonly ILogger logger;
-        readonly CancellationTokenSource terminationTokenSource = new CancellationTokenSource();
 
         public KafkaListenerService(
             IDeserializer<TKey> keyDeserializer,
@@ -35,7 +34,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
             this.logger = logger;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             var settings = listenerSettings.Value;
 
@@ -77,59 +76,59 @@ namespace Microsoft.Extensions.Hosting.Kafka
             // Subscribe to the given topics
             consumer.Subscribe(settings.Topics.ToList());
 
-            listener = Task.Run(async () =>
-            {
-                while (!terminationTokenSource.Token.IsCancellationRequested)
-                {
-                    consumer.Consume(out var msg, TimeSpan.FromSeconds(1));
-                    if (msg != null)
-                    {
-                        logger.LogDebug($"Received message from topic '{msg.Topic}:{msg.Partition}' with offset: '{msg.Offset}[{msg.TopicPartitionOffset}]'");
-
-                        using (var scope = serviceProvider.CreateScope())
-                        {
-                            var handler = scope.ServiceProvider.GetService<IKafkaMessageHandler<TKey, TValue>>();
-                            if (handler == null)
-                            {
-                                logger.LogError("Failed to resolve message handler. Did you add it to your DI setup.");
-                                continue;
-                            }
-                            try
-                            {
-                                // Invoke the handler
-                                await handler.Handle(msg);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.LogError(e, "Message handler failed:");
-                                continue;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        logger.LogDebug("No messages received");
-                    }
-                }
-            });
-
-            return Task.CompletedTask;
+            return base.StartAsync(cancellationToken);
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            terminationTokenSource.Cancel();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                consumer.Consume(out var msg, TimeSpan.FromSeconds(1));
+                if (msg != null)
+                {
+                    logger.LogDebug($"Received message from topic '{msg.Topic}:{msg.Partition}' with offset: '{msg.Offset}[{msg.TopicPartitionOffset}]'");
 
-            var awaitForceShutdown = Task.Run(() => cancellationToken.WaitHandle.WaitOne());
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var handler = scope.ServiceProvider.GetService<IKafkaMessageHandler<TKey, TValue>>();
+                        if (handler == null)
+                        {
+                            logger.LogError("Failed to resolve message handler. Did you add it to your DI setup.");
+                            continue;
+                        }
+                        try
+                        {
+                            // Invoke the handler
+                            await handler.Handle(msg);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.LogError(e, "Message handler failed:");
+                            continue;
+                        }
+                    }
+                }
+                else
+                {
+                    logger.LogDebug("No messages received");
+                }
+            }
+        }
 
-            if (await Task.WhenAny(listener, awaitForceShutdown) == awaitForceShutdown)
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+
+                await base.StopAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
             {
                 logger.LogWarning("Kafka listener did not terminated in the allotted time and will be forced.");
                 return;
             }
 
             consumer.Dispose();
-
             logger.LogInformation("Kafka listener terminated successfully");
         }
     }
