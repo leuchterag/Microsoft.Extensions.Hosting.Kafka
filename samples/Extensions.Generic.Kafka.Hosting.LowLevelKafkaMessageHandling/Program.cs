@@ -1,13 +1,10 @@
-﻿using Confluent.Kafka.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
@@ -23,7 +20,7 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                     hostContext.HostingEnvironment.ApplicationName = "Sample Hostbuilder Kafka Lowlevel Consumer";
                     hostContext.HostingEnvironment.ContentRootPath = Directory.GetCurrentDirectory();
                 })
-                .UseKafka(config => 
+                .UseKafka(config =>
                 {
                     // Configuration for the kafka consumer
                     config.BootstrapServers = new[] { "localhost:29092" };
@@ -40,9 +37,9 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                     container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<string, byte[]>), typeof(CustomKafkaMessageHandler), ServiceLifetime.Scoped));
                     container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, JObject>), typeof(JobMessageHandler), ServiceLifetime.Scoped));
 
-                    
+
                 })
-                .ConfigureLogging((ILoggingBuilder loggingBuilder) =>
+                .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.AddConsole();
                 })
