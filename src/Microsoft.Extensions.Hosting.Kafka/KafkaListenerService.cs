@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -120,7 +119,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             terminationTokenSource.Cancel();
-            
+
             var awaitForceShutdown = Task.Run(() => cancellationToken.WaitHandle.WaitOne());
 
             if (await Task.WhenAny(listener, awaitForceShutdown) == awaitForceShutdown)
@@ -131,7 +130,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
             consumer.Dispose();
 
-            logger.LogInformation("Kafka listener terminated succesfully");
+            logger.LogInformation("Kafka listener terminated successfully");
         }
     }
 }

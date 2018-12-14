@@ -2,7 +2,7 @@
 
 namespace Microsoft.Extensions.Hosting.Kafka
 {
-    public interface IMessageHandler<TKey, TValue>
+    public interface IMessageHandler<in TKey, in TValue>
     {
         Task Handle(TKey key, TValue value);
     }

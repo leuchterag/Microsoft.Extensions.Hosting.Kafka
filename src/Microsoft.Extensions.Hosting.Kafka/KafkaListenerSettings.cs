@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
             get
             {
                 var value = this["enable.auto.commit"];
-                if (value != null && value is bool)
+                if (value is bool)
                 {
                     return (bool)value;
                 }
@@ -26,14 +26,11 @@ namespace Microsoft.Extensions.Hosting.Kafka
                 return false;
             }
 
-            set
-            {
-                this["enable.auto.commit"] = value;
-            }
+            set => this["enable.auto.commit"] = value;
         }
 
         /// <summary>
-        /// Auto commit intervall in ms
+        /// Auto commit interval in ms
         /// </summary>
         public int? AutoCommitIntervall
         {
@@ -46,10 +43,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
         /// </summary>
         public IEnumerable<string> BootstrapServers
         {
-            get
-            {
-                return (this["bootstrap.servers"] as string).Split(',');
-            }
+            get => (this["bootstrap.servers"] as string).Split(',');
             set => this["bootstrap.servers"] = string.Join(",", value);
         }
 
