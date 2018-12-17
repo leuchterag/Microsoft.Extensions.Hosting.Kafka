@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
             this.logger = logger;
         }
 
-        public override async Task StartAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             var settings = listenerSettings.Value;
 
@@ -75,6 +75,8 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
             // Subscribe to the given topics
             consumer.Subscribe(settings.Topics.ToList());
+
+            return base.StartAsync(cancellationToken);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -113,9 +115,10 @@ namespace Microsoft.Extensions.Hosting.Kafka
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
             try
+            {
 
                 await base.StopAsync(cancellationToken);
             }
