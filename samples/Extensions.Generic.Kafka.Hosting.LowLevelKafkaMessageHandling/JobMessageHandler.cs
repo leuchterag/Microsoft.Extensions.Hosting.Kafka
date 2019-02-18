@@ -17,7 +17,7 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 
         public Task Handle(string key, JObject value)
         {
-            logger.LogInformation($"Received message from Kafka: {key} \n{value.ToString()}");
+            logger.LogInformation($"Received message from Kafka:\n{value}");
             return Task.CompletedTask;
         }
     }
