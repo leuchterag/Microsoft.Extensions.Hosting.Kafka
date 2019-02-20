@@ -36,8 +36,6 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                     // The message that matches the
                     container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<string, byte[]>), typeof(CustomKafkaMessageHandler), ServiceLifetime.Scoped));
                     container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, JObject>), typeof(JobMessageHandler), ServiceLifetime.Scoped));
-
-
                 })
                 .ConfigureLogging(loggingBuilder =>
                 {
