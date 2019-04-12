@@ -1,19 +1,18 @@
-﻿using Confluent.Kafka.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 {
-    class DatetimeDeserializer : IDeserializer<DateTimeOffset>
+    static class DatetimeDeserializer
     {
-        public IEnumerable<KeyValuePair<string, object>> Configure(IEnumerable<KeyValuePair<string, object>> config, bool isKey)
+        public static DateTimeOffset Deserialize(ReadOnlySpan<byte> data, bool isNull)
         {
-            return config;
-        }
+            if (isNull)
+            {
+                return DateTimeOffset.UtcNow;
+            }
 
-        public DateTimeOffset Deserialize(string topic, byte[] data)
-        {
             try
             {
                 var utf8String = Encoding.UTF8.GetString(data);
@@ -29,11 +28,6 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
             {
                 throw new FormatException($"General error while parsing byte[] to DateTimeOffset", e);
             }
-        }
-
-        public void Dispose()
-        {
-            
         }
     }
 }

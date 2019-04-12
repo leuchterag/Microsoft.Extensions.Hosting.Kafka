@@ -26,16 +26,15 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                     config.BootstrapServers = new[] { "localhost:29092" };
                     config.Topics = new[] { "topic1" };
                     config.ConsumerGroup = "group1";
-                    config.DefaultTopicConfig = new Dictionary<string, object>
-                    {
-                        { "auto.offset.reset", "smallest" }
-                    };
+                    config.AutoOffsetReset = "Latest";
+                    config.AutoCommitIntervall = 5000;
+                    config.IsAutocommitEnabled = true;
                 })
                 .ConfigureServices(container =>
                 {
                     // The message that matches the
-                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<string, byte[]>), typeof(CustomKafkaMessageHandler), ServiceLifetime.Scoped));
-                    container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, JObject>), typeof(JobMessageHandler), ServiceLifetime.Scoped));
+                    container.AddScoped<IKafkaMessageHandler<string, byte[]>, CustomKafkaMessageHandler>();
+                    container.AddScoped<IMessageHandler<string, JObject>, JobMessageHandler>();
                 })
                 .ConfigureLogging(loggingBuilder =>
                 {

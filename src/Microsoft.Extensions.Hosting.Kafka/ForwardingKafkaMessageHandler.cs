@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
             this.messageHandler = messageHandler;
         }
 
-        public Task Handle(Message<TKey, TMessage> message)
+        public Task Handle(ConsumeResult<TKey, TMessage> message)
         {
             return messageHandler.Handle(message.Key, message.Value);
         }

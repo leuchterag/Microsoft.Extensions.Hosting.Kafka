@@ -1,5 +1,4 @@
-﻿using Confluent.Kafka.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
@@ -28,19 +27,20 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                     config.BootstrapServers = new[] { "kafka:9092" };
                     config.Topics = new[] { "topic1" };
                     config.ConsumerGroup = "group1";
-                    config.DefaultTopicConfig = new Dictionary<string, object>
-                        {
-                            { "auto.offset.reset", "smallest" }
-                        };
-                }) // Equivalent to .UseKafka<string, byte[]>()
+                    config.AutoOffsetReset = "Latest";
+                    config.AutoCommitIntervall = 5000;
+                    config.IsAutocommitEnabled = true;
+                },
+                consumerBuild =>
+                {
+                    consumerBuild.SetKeyDeserializer(DatetimeDeserializer.Deserialize);
+                })
                 .ConfigureServices(container =>
                 {
                     // The message that matches the 
                     container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, byte[]>), typeof(JobMessageHandler), ServiceLifetime.Singleton));
 
                     // Add the necessary serializers into DI!
-                    container.Add(new ServiceDescriptor(typeof(IDeserializer<string>), new StringDeserializer(Encoding.UTF8)));
-                    container.Add(new ServiceDescriptor(typeof(IDeserializer<DateTimeOffset>), typeof(DatetimeDeserializer), ServiceLifetime.Singleton));
                 })
                 .ConfigureLogging((ILoggingBuilder loggingBuilder) =>
                 {

@@ -17,10 +17,14 @@ namespace Microsoft.Extensions.Hosting.Kafka
         {
             get
             {
-                var value = this["enable.auto.commit"];
-                if (value is bool)
+                if(!ContainsKey("enable.auto.commit"))
                 {
-                    return (bool)value;
+                    return false;
+                }
+                var value = this["enable.auto.commit"];
+                if (value is bool b)
+                {
+                    return b;
                 }
 
                 return false;
@@ -34,8 +38,23 @@ namespace Microsoft.Extensions.Hosting.Kafka
         /// </summary>
         public int? AutoCommitIntervall
         {
-            get => this["auto.commit.interval.ms"] as int?;
+            get
+            {
+                return ContainsKey("auto.commit.interval.ms") ? this["auto.commit.interval.ms"] as int? : new int?();
+            }
             set => this["auto.commit.interval.ms"] = value;
+        }
+
+        /// <summary>
+        /// Auto reset offset [earliest|latest|none]
+        /// </summary>
+        public string AutoOffsetReset
+        {
+            get
+            {
+                return ContainsKey("auto.offset.reset") ? this["auto.offset.reset"] as string : string.Empty;
+            }
+            set => this["auto.offset.reset"] = value;
         }
 
         /// <summary>

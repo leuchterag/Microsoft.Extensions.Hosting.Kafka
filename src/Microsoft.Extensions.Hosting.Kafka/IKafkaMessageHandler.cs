@@ -5,6 +5,6 @@ namespace Microsoft.Extensions.Hosting.Kafka
 {
     public interface IKafkaMessageHandler<TKey, TMessage>
     {
-        Task Handle(Message<TKey, TMessage> message);
+        Task Handle(ConsumeResult<TKey, TMessage> message);
     }
 }

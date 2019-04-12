@@ -1,11 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
@@ -21,7 +19,7 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
             this.logger = logger;
         }
 
-        public async Task Handle(Message<string, byte[]> message)
+        public async Task Handle(ConsumeResult<string, byte[]> message)
         {
             logger.LogInformation($"Handling message from Kafka at offset: {message.Offset}");
             using (var stream = new MemoryStream(message.Value))

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Kafka;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,24 +18,20 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
                     hostContext.HostingEnvironment.ApplicationName = "Sample Hostbuilder Kafka Consumer Sample";
                     hostContext.HostingEnvironment.ContentRootPath = Directory.GetCurrentDirectory();
                 })
-                .UseKafka() // Equivalent to .UseKafka<string, byte[]>()
+                .UseKafka(config => // Equivalent to .UseKafka<string, byte[]>()
+                {
+                    // Configuration for the kafka consumer
+                    config.BootstrapServers = new[] { "kafka:9092" };
+                    config.Topics = new[] { "topic1" };
+                    config.ConsumerGroup = "group3";
+                    config.AutoOffsetReset = "Latest";
+                    config.AutoCommitIntervall = 1000;
+                    config.IsAutocommitEnabled = true;
+                })
                 .ConfigureServices(container =>
                 {
                     // The message that matches the 
-                    container.Add(new ServiceDescriptor(typeof(IMessageHandler<string, byte[]>), typeof(JobMessageHandler), ServiceLifetime.Singleton));
-
-                    // Configuration for the kafka consumer
-                    container.Configure<KafkaListenerSettings>(config =>
-                    {
-
-                        config.BootstrapServers = new[] { "localhost:29092" };
-                        config.Topics = new[] { "topic1" };
-                        config.ConsumerGroup = "group1";
-                        config.DefaultTopicConfig = new Dictionary<string, object>
-                        {
-                            { "auto.offset.reset", "smallest" }
-                        };
-                    });
+                    container.AddScoped<IMessageHandler<string, byte[]>, JobMessageHandler>();
                 })
                 .ConfigureLogging((ILoggingBuilder loggingBuilder) =>
                 {
