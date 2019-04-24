@@ -75,6 +75,11 @@ namespace Microsoft.Extensions.Hosting.Kafka
                             logger.LogDebug("No messages received");
                         }
                     }
+                    catch (OperationCanceledException)
+                    {
+                        logger.LogInformation("Terminating Kafka listener...");
+                        break;
+                    }
                     catch (Exception e)
                     {
                         logger.LogError(e, "Failed to receive message.", e);

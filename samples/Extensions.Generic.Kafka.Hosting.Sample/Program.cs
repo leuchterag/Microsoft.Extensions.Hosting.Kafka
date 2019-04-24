@@ -20,18 +20,22 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
                 })
                 .UseKafka(config => // Equivalent to .UseKafka<string, byte[]>()
                 {
-                    // Configuration for the kafka consumer
                     config.BootstrapServers = new[] { "kafka:9092" };
-                    config.Topics = new[] { "topic1" };
-                    config.ConsumerGroup = "group3";
-                    config.AutoOffsetReset = "Latest";
-                    config.AutoCommitIntervall = 1000;
-                    config.IsAutocommitEnabled = true;
                 })
                 .ConfigureServices(container =>
                 {
                     // The message that matches the 
                     container.AddScoped<IMessageHandler<string, byte[]>, JobMessageHandler>();
+                    
+                    // Additional configuration
+                    container.Configure<KafkaListenerSettings>(config =>
+                    {
+                        config.Topics = new[] { "topic1" };
+                        config.ConsumerGroup = "group1";
+                        config.AutoOffsetReset = "Latest";
+                        config.AutoCommitIntervall = 5000;
+                        config.IsAutocommitEnabled = true;
+                    });
                 })
                 .ConfigureLogging((ILoggingBuilder loggingBuilder) =>
                 {

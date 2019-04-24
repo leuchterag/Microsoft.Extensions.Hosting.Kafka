@@ -19,18 +19,31 @@ namespace Microsoft.Extensions.Hosting
             });
         }
 
+        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder)
+        {
+            return hostBuilder.UseKafka<string, byte[]>();
+        }
+
+        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate)
+        {
+            hostBuilder.UseKafka<string, byte[]>(configureDelegate);
+
+            return hostBuilder;
+        }
+
         public static IHostBuilder UseKafka<TKey, TValue>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
         {
             hostBuilder.ConfigureServices(
                 (hostCtx, container) =>
                 {
+                    container.AddOptions<KafkaListenerSettings>();
+                    container.Configure(configureDelegate);
                     container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<TKey, TValue>), typeof(ForwardingKafkaMessageHandler<TKey, TValue>), ServiceLifetime.Scoped));
+
                     container.AddSingleton<IHostedService>(sp =>
                     {
                         var logger = sp.GetRequiredService<ILogger<KafkaListenerService<TKey, TValue>>>();
                         var kafkaConfig = sp.GetRequiredService<IOptions<KafkaListenerSettings>>().Value;
-
-                        configureDelegate?.Invoke(kafkaConfig);
 
                         var offsetReset = AutoOffsetReset.Latest;
                         if (!Enum.TryParse(kafkaConfig.AutoOffsetReset, false, out offsetReset))
@@ -81,24 +94,7 @@ namespace Microsoft.Extensions.Hosting
 
                         return new KafkaListenerService<TKey, TValue>(sp, consumer, kafkaConfig.Topics, logger);
                     });
-                    container.Configure(configureDelegate);
                 });
-
-            return hostBuilder;
-        }
-
-        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder)
-        {
-            return hostBuilder.UseKafka(config =>
-            {
-                config.BootstrapServers = new[] { "localhost:9092" };
-            });
-        }
-
-
-        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate)
-        {
-            hostBuilder.UseKafka<string, byte[]>(configureDelegate);
 
             return hostBuilder;
         }
