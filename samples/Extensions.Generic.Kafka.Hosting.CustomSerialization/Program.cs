@@ -33,7 +33,7 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
                 },
                 consumerBuild =>
                 {
-                    consumerBuild.SetKeyDeserializer(DatetimeDeserializer.Deserialize);
+                    consumerBuild.SetKeyDeserializer(new DatetimeDeserializer());
                 })
                 .ConfigureServices(container =>
                 {
