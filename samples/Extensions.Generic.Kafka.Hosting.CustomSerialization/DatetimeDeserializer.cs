@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Confluent.Kafka;
 
 namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
 {
-    static class DatetimeDeserializer
+    class DatetimeDeserializer : IDeserializer<System.DateTimeOffset>
     {
-        public static DateTimeOffset Deserialize(ReadOnlySpan<byte> data, bool isNull)
+
+        public DateTimeOffset Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
             if (isNull)
             {
