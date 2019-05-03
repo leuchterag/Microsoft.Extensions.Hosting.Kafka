@@ -13,12 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Generic.Kafka.Ho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Generic.Kafka.Hosting.CustomSerialization", "samples\Extensions.Generic.Kafka.Hosting.CustomSerialization\Extensions.Generic.Kafka.Hosting.CustomSerialization.csproj", "{1EABE3AA-F1C7-4A12-AF9C-4BCFE9D842B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9FC09F01-22F2-4DE1-998C-C8384C17239E}"
-	ProjectSection(SolutionItems) = preProject
-		version.props = version.props
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling", "samples\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling.csproj", "{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling", "samples\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling\Extensions.Generic.Kafka.Hosting.LowLevelKafkaMessageHandling.csproj", "{F1933DFA-5CBB-4FC9-9E6E-E7E0B7CB9348}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

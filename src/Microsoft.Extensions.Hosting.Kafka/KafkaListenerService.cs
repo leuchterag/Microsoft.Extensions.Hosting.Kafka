@@ -48,26 +48,35 @@ namespace Microsoft.Extensions.Hosting.Kafka
                         var msg = consumer.Consume(stoppingToken);
                         if (msg != null)
                         {
-                            logger.LogDebug($"Received message from topic '{msg.Topic}:{msg.Partition}' with offset: '{msg.Offset}[{msg.TopicPartitionOffset}]'");
-
-                            using (var scope = serviceProvider.CreateScope())
+                            if(msg.Message != null)
                             {
-                                var handler = scope.ServiceProvider.GetService<IKafkaMessageHandler<TKey, TValue>>();
-                                if (handler == null)
+                                logger.LogDebug($"Received message from topic '{msg.Topic}:{msg.Partition}' with offset: '{msg.Offset}[{msg.TopicPartitionOffset}]'");
+
+                                using (var scope = serviceProvider.CreateScope())
                                 {
-                                    logger.LogError("Failed to resolve message handler. Did you add it to your DI setup.");
-                                    continue;
+                                    var handler = scope.ServiceProvider.GetService<IKafkaMessageHandler<TKey, TValue>>();
+                                    if (handler == null)
+                                    {
+                                        logger.LogError("Failed to resolve message handler. Did you add it to your DI setup?");
+                                        continue;
+                                    }
+                                    try
+                                    {
+                                        // Invoke the handler
+                                        await handler.Handle(msg);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        logger.LogError(e, "Message handler failed", e);
+                                        continue;
+                                    }
                                 }
-                                try
-                                {
-                                    // Invoke the handler
-                                    await handler.Handle(msg);
-                                }
-                                catch (Exception e)
-                                {
-                                    logger.LogError(e, "Message handler failed", e);
-                                    continue;
-                                }
+                            }
+            
+                            // If needed report the end of the partition
+                            if (msg.IsPartitionEOF)
+                            {
+                                logger.LogInformation($"End of topic {msg.Topic} partition {msg.Partition} reached at offset {msg.Offset}");
                             }
                         }
                         else

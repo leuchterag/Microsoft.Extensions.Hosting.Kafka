@@ -20,7 +20,7 @@ namespace Extensions.Generic.Kafka.Hosting.Sample
                 })
                 .UseKafka(config => // Equivalent to .UseKafka<string, byte[]>()
                 {
-                    config.BootstrapServers = new[] { "kafka:9092" };
+                    config.BootstrapServers = new[] { "broker:9092" };
                 })
                 .ConfigureServices(container =>
                 {
