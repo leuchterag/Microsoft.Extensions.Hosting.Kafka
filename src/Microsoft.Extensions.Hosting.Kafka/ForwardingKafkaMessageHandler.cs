@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Confluent.Kafka;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.Hosting.Kafka
 {
