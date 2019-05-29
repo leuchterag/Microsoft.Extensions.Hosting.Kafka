@@ -38,8 +38,8 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Task.Run(async () => {
-                    
+            await Task.Run(async () =>
+            {
                 while (!stoppingToken.IsCancellationRequested)
                 {
 
@@ -48,7 +48,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
                         var msg = consumer.Consume(stoppingToken);
                         if (msg != null)
                         {
-                            if(msg.Message != null)
+                            if (msg.Message != null)
                             {
                                 logger.LogDebug($"Received message from topic '{msg.Topic}:{msg.Partition}' with offset: '{msg.Offset}[{msg.TopicPartitionOffset}]'");
 
@@ -72,7 +72,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
                                     }
                                 }
                             }
-            
+
                             // If needed report the end of the partition
                             if (msg.IsPartitionEOF)
                             {
@@ -103,14 +103,24 @@ namespace Microsoft.Extensions.Hosting.Kafka
             try
             {
                 await base.StopAsync(cancellationToken);
+
+                consumer.Dispose();
+            }
+            catch(EntryPointNotFoundException)
+            {
+                // This exception must not be processed in this case
             }
             catch (OperationCanceledException)
             {
                 logger.LogWarning("Kafka listener did not terminated in the allotted time and will be forced.");
                 return;
             }
+            catch (Exception e)
+            {
+                logger.LogWarning(e, "Kafka listener did not terminate gracefully");
+                return;
+            }
 
-            consumer.Dispose();
             logger.LogInformation("Kafka listener terminated successfully");
         }
     }
