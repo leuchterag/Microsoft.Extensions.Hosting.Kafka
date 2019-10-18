@@ -1,0 +1,63 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+trigger:
+  branches:
+    include:
+    - refs/tags/*
+    - master
+  paths:
+    include:
+    - docs/*
+    exclude:
+    - docs/README.md
+pr:
+- master
+- releases/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Dotnet Restore
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+    verbosityRestore: 'Minimal'
+
+- task: DotNetCoreCLI@2
+  displayName: Dotnet Build
+  inputs:
+    command: 'build'
+    arguments: '-c $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Dotnet Test
+  inputs:
+    command: 'test'
+
+- task: DotNetCoreCLI@2
+  displayName: Dotnet Pack
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(Build.SourcesDirectory)/src/**/*.csproj'
+    nobuild: true
+    includesource: true
+    versioningScheme: 'off'
+    verbosityPack: 'Normal'
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
