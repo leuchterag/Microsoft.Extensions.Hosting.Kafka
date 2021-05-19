@@ -31,14 +31,21 @@ namespace Microsoft.Extensions.Hosting
             return hostBuilder;
         }
 
+
         public static IHostBuilder UseKafka<TKey, TValue>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
+        {
+            return hostBuilder.UseKafka<TKey, TValue, ForwardingKafkaMessageHandler<TKey, TValue>>(configureDelegate);
+        }
+
+        public static IHostBuilder UseKafka<TKey, TValue, THandler>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
+            where THandler: IKafkaMessageHandler<TKey, TValue>
         {
             hostBuilder.ConfigureServices(
                 (hostCtx, container) =>
                 {
                     container.AddOptions<KafkaListenerSettings>();
                     container.Configure(configureDelegate);
-                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<TKey, TValue>), typeof(ForwardingKafkaMessageHandler<TKey, TValue>), ServiceLifetime.Scoped));
+                    container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<TKey, TValue>), typeof(THandler), ServiceLifetime.Scoped));
 
                     container.AddSingleton<IHostedService>(sp =>
                     {
