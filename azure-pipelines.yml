@@ -1,7 +1,3 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 trigger:
   branches:
     include:
@@ -24,40 +20,96 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
-- task: DotNetCoreCLI@2
-  displayName: Dotnet Restore
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-    verbosityRestore: 'Minimal'
+jobs:
+- job: Build
+  displayName: Build Kafka Hosting Library
+  timeoutInMinutes: 10
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: DotnetGlobalToolInstaller@0
+    inputs:
+      name: 'minver-cli'
+      versionSpec: '2.5.0'
 
-- task: DotNetCoreCLI@2
-  displayName: Dotnet Build
-  inputs:
-    command: 'build'
-    arguments: '-c $(buildConfiguration)'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $version = & minver -t release/ 2>$null
+        Write-Host ("##vso[task.setvariable variable=MinVerVersion;]$version")
+        
+        $json = [ordered]@{ version = $version;  }
+        $json  | ConvertTo-Json -depth 100 | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/version.json
+        
+        exit 0
+      errorActionPreference: 'continue'
+      ignoreLASTEXITCODE: true
+      pwsh: true
 
-- task: DotNetCoreCLI@2
-  displayName: Dotnet Test
-  inputs:
-    command: 'test'
+  - task: DotNetCoreCLI@2
+    displayName: Dotnet Restore
+    inputs:
+      command: 'restore'
+      feedsToUse: 'select'
+      verbosityRestore: 'Minimal'
 
-- task: DotNetCoreCLI@2
-  displayName: Dotnet Pack
-  inputs:
-    command: 'pack'
-    packagesToPack: '$(Build.SourcesDirectory)/src/**/*.csproj'
-    nobuild: true
-    includesource: true
-    versioningScheme: 'off'
-    verbosityPack: 'Normal'
+  - task: DotNetCoreCLI@2
+    displayName: Dotnet Build
+    inputs:
+      command: 'build'
+      arguments: '-c $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: Dotnet Test
+    inputs:
+      command: 'test'
+
+  - task: DotNetCoreCLI@2
+    displayName: Dotnet Pack
+    inputs:
+      command: 'pack'
+      packagesToPack: '$(Build.SourcesDirectory)/src/**/*.csproj'
+      nobuild: true
+      includesource: true
+      versioningScheme: 'off'
+      verbosityPack: 'Normal'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifacts
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+- deployment: kafka_hosting_nuget
+  displayName: Release Kafka Hosting Library NuGet packages
+  environment: Production
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            downloadType: single
+            artifactName: drop
+            downloadPath: '$(Pipeline.Workspace)'
 
-- task: PublishBuildArtifacts@1
-  displayName: Publish Artifacts
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+        - powershell: |
+            $json = Get-Content -Raw -Path version.json  | ConvertFrom-Json
+            Write-Host $json
+            $version = $json.version
+            Write-Host ("##vso[task.setvariable variable=Version;]$version")
+          workingDirectory: '$(Pipeline.Workspace)/drop/'
+          displayName: 'Rehydrate Minver Version and function info'
+
+        - task: NuGetCommand@2
+          displayName: Push Package to Azure Artifact Store
+          inputs:
+            command: 'push'
+            packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+            nuGetFeedType: 'internal'
+            publishVstsFeed: 'bf8c646d-4ad2-4b52-ab93-7a77158baf78'
