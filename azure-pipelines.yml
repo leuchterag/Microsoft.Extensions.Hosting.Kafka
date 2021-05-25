@@ -110,6 +110,6 @@ jobs:
           displayName: Push Package to Azure Artifact Store
           inputs:
             command: 'push'
-            packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+            packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
             nuGetFeedType: 'internal'
             publishVstsFeed: 'bf8c646d-4ad2-4b52-ab93-7a77158baf78'
