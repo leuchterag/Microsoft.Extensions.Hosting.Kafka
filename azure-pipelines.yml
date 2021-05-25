@@ -87,6 +87,7 @@ jobs:
 - deployment: kafka_hosting_nuget
   displayName: Release Kafka Hosting Library NuGet packages
   environment: Production
+  dependsOn: Build
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   strategy:
     runOnce:
