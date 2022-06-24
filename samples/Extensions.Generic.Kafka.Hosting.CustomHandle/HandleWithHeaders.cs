@@ -17,13 +17,13 @@ namespace Extensions.Generic.Kafka.Hosting.CustomHandle
 
         public Task Handle(ConsumeResult<string, byte[]> message)
         {
-            if (message.Headers.TryGetLastBytes("traceId", out var traceIdBytes))
+            if (message.Message.Headers.TryGetLastBytes("traceId", out var traceIdBytes))
             {
-                logger.LogInformation($"Received message with trace ID {Encoding.UTF8.GetString(traceIdBytes)} from Kafka {message.Key} : {Encoding.UTF8.GetString(message.Value)}");
+                logger.LogInformation($"Received message.Message.with trace ID {Encoding.UTF8.GetString(traceIdBytes)} from Kafka {message.Message.Key} : {Encoding.UTF8.GetString(message.Message.Value)}");
                 return Task.CompletedTask;
             }
 
-            logger.LogInformation($"Received message without trace ID from Kafka {message.Key} : {Encoding.UTF8.GetString(message.Value)}");
+            logger.LogInformation($"Received message.Message.without trace ID from Kafka {message.Message.Key} : {Encoding.UTF8.GetString(message.Message.Value)}");
             return Task.CompletedTask;
         }
     }

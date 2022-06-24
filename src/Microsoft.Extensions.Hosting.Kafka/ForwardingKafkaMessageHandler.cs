@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.Hosting.Kafka
 
         public Task Handle(ConsumeResult<TKey, TMessage> message)
         {
-            return messageHandler.Handle(message.Key, message.Value);
+            return messageHandler.Handle(message.Message.Key, message.Message.Value);
         }
     }
 }

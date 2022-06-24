@@ -8,8 +8,8 @@
 
   <PropertyGroup>
     <PackageId>Kafka.Extensions.Hosting</PackageId>
-    <Authors>Michael (Enzian) Ingold</Authors>
-    <Company>Leuchter AG</Company>
+    <Authors>Docugate Core Team</Authors>
+    <Company>Leuchter Software Engineering</Company>
     <Product>Kafka.Extensions.Hosting</Product>
     <PackageTags>Kafka, Hosting</PackageTags>
     <RepositoryUrl>https://github.com/leuchterag/Microsoft.Extensions.Hosting.Kafka</RepositoryUrl>
@@ -17,13 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="1.2.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
-    <PackageReference Include="MinVer" Version="2.5.0">
+    <PackageReference Include="Confluent.Kafka" Version="1.9.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="MinVer" Version="4.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 

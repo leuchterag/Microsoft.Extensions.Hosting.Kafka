@@ -22,13 +22,13 @@ namespace Extensions.Generic.Kafka.Hosting.CustomSerialization
         public async Task Handle(ConsumeResult<string, byte[]> message)
         {
             logger.LogInformation($"Handling message from Kafka at offset: {message.Offset}");
-            using (var stream = new MemoryStream(message.Value))
+            using (var stream = new MemoryStream(message.Message.Value))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 var content = await reader.ReadToEndAsync();
                 var obj = JObject.Parse(content);
 
-                await messageHandler.Handle(message.Key, obj);
+                await messageHandler.Handle(message.Message.Key, obj);
             }
         }
     }
