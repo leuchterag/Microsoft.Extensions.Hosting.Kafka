@@ -21,7 +21,7 @@ variables:
   buildConfiguration: 'Release'
 
 jobs:
-- job: Build
+- job: build
   displayName: Build Kafka Hosting Library
   timeoutInMinutes: 10
   pool:
@@ -31,21 +31,6 @@ jobs:
     inputs:
       name: 'minver-cli'
       versionSpec: '2.5.0'
-
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: |
-        $version = & minver -t release/ 2>$null
-        Write-Host ("##vso[task.setvariable variable=MinVerVersion;]$version")
-        
-        $json = [ordered]@{ version = $version;  }
-        $json  | ConvertTo-Json -depth 100 | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/version.json
-        
-        exit 0
-      errorActionPreference: 'continue'
-      ignoreLASTEXITCODE: true
-      pwsh: true
 
   - task: DotNetCoreCLI@2
     displayName: Dotnet Restore
@@ -87,30 +72,15 @@ jobs:
 - deployment: kafka_hosting_nuget
   displayName: Release Kafka Hosting Library NuGet packages
   environment: Production
-  dependsOn: Build
+  dependsOn: build
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   strategy:
     runOnce:
       deploy:
         steps:
-        - task: DownloadBuildArtifacts@0
-          inputs:
-            downloadType: single
-            artifactName: drop
-            downloadPath: '$(Pipeline.Workspace)'
-
-        - powershell: |
-            $json = Get-Content -Raw -Path version.json  | ConvertFrom-Json
-            Write-Host $json
-            $version = $json.version
-            Write-Host ("##vso[task.setvariable variable=Version;]$version")
-          workingDirectory: '$(Pipeline.Workspace)/drop/'
-          displayName: 'Rehydrate Minver Version and function info'
-
         - task: NuGetCommand@2
-          displayName: Push Package to Azure Artifact Store
           inputs:
             command: 'push'
             packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
-            nuGetFeedType: 'internal'
-            publishVstsFeed: 'bf8c646d-4ad2-4b52-ab93-7a77158baf78'
+            nuGetFeedType: 'external'
+            publishFeedCredentials: 'nuget.org (leuchterbird)'
