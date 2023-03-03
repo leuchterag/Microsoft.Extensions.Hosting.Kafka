@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Kafka;
@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.Hosting
 
         public static IHostBuilder UseKafka<TKey, TValue>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
         {
-            return hostBuilder.UseKafka<TKey, TValue, ForwardingKafkaMessageHandler<TKey, TValue>>(configureDelegate);
+            return hostBuilder.UseKafka<TKey, TValue, ForwardingKafkaMessageHandler<TKey, TValue>>(configureDelegate, builderConfig);
         }
 
         public static IHostBuilder UseKafka<TKey, TValue, THandler>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
@@ -58,7 +58,7 @@ namespace Microsoft.Extensions.Hosting
                             logger.LogError($"Failed to parse value for AutoOffsetReset {kafkaConfig.AutoOffsetReset}, falling back to {nameof(AutoOffsetReset.Latest)}");
                         }
 
-                        var config = new ConsumerConfig
+                        var config = new ConsumerConfig(kafkaConfig.ToDictionary(x => x.Key, x => x.Value.ToString()))
                         {
                             GroupId = kafkaConfig.ConsumerGroup,
                             BootstrapServers = string.Join(",", kafkaConfig.BootstrapServers),
