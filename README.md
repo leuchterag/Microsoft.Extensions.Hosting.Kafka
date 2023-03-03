@@ -25,10 +25,6 @@ public static async Task Main(string[] args)
                 config.BootstrapServers = new[] { "kafka:9092" };
                 config.Topics = new[] { "topic1" };
                 config.ConsumerGroup = "group1";
-                config.DefaultTopicConfig = new Dictionary<string, object>
-                {
-                    { "auto.offset.reset", "smallest" }
-                };
             });
         })
         .Build();

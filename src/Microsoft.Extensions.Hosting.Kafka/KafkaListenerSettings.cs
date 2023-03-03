@@ -66,20 +66,6 @@ namespace Microsoft.Extensions.Hosting.Kafka
             set => this["bootstrap.servers"] = string.Join(",", value);
         }
 
-        public IDictionary<string, object> DefaultTopicConfig
-        {
-            get
-            {
-                if (!ContainsKey("default.topic.config"))
-                {
-                    this["default.topic.config"] = new Dictionary<string, object>();
-                }
-
-                return this["default.topic.config"] as IDictionary<string, object>;
-            }
-            set => this["default.topic.config"] = value;
-        }
-
         public IEnumerable<string> Topics { get; set; }
     }
 }

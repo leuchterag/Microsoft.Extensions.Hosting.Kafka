@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.Hosting
                             BootstrapServers = string.Join(",", kafkaConfig.BootstrapServers),
                             AutoOffsetReset = offsetReset,
                             AutoCommitIntervalMs = kafkaConfig.AutoCommitIntervall,
-                            EnableAutoCommit = kafkaConfig.IsAutocommitEnabled
+                            EnableAutoCommit = kafkaConfig.IsAutocommitEnabled,
                         };
 
                         var builder = new ConsumerBuilder<TKey, TValue>(config)
