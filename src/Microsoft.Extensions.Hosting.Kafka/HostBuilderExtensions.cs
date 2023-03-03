@@ -58,7 +58,7 @@ namespace Microsoft.Extensions.Hosting
                             logger.LogError($"Failed to parse value for AutoOffsetReset {kafkaConfig.AutoOffsetReset}, falling back to {nameof(AutoOffsetReset.Latest)}");
                         }
 
-                        var config = new ConsumerConfig(kafkaConfig.ToDictionary(x => x.Key, x => x.Value.ToString()))
+                        var config = new ConsumerConfig(kafkaConfig.ToDictionary(x => x.Key, x => x.Value?.ToString()))
                         {
                             GroupId = kafkaConfig.ConsumerGroup,
                             BootstrapServers = string.Join(",", kafkaConfig.BootstrapServers),
