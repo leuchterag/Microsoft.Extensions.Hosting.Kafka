@@ -11,40 +11,43 @@ namespace Microsoft.Extensions.Hosting
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder UseKafka<TKey, TMessage>(this IHostBuilder hostBuilder)
+        public static IHostBuilder UseKafka<TKey, TMessage>(this IHostBuilder hostBuilder, int maxDegreeOfParallelism = 1)
         {
-            return hostBuilder.UseKafka<TKey, TMessage>(config =>
+            return hostBuilder.UseKafka<TKey, TMessage>(maxDegreeOfParallelism: maxDegreeOfParallelism, configureDelegate: config =>
             {
                 config.BootstrapServers = new[] { "localhost:9092" };
             });
         }
 
-        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder)
+        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, int maxDegreeOfParallelism = 1)
         {
-            return hostBuilder.UseKafka<string, byte[]>();
+            return hostBuilder.UseKafka<string, byte[]>(maxDegreeOfParallelism: maxDegreeOfParallelism);
         }
 
-        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate)
+        public static IHostBuilder UseKafka(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, int maxDegreeOfParallelism = 1)
         {
-            hostBuilder.UseKafka<string, byte[]>(configureDelegate);
+            hostBuilder.UseKafka<string, byte[]>(configureDelegate, maxDegreeOfParallelism: maxDegreeOfParallelism);
 
             return hostBuilder;
         }
 
 
-        public static IHostBuilder UseKafka<TKey, TValue>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
+        public static IHostBuilder UseKafka<TKey, TValue>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate = null, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null, int maxDegreeOfParallelism = 1)
         {
-            return hostBuilder.UseKafka<TKey, TValue, ForwardingKafkaMessageHandler<TKey, TValue>>(configureDelegate, builderConfig);
+            return hostBuilder.UseKafka<TKey, TValue, ForwardingKafkaMessageHandler<TKey, TValue>>(configureDelegate, builderConfig, maxDegreeOfParallelism);
         }
 
-        public static IHostBuilder UseKafka<TKey, TValue, THandler>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null)
+        public static IHostBuilder UseKafka<TKey, TValue, THandler>(this IHostBuilder hostBuilder, Action<KafkaListenerSettings> configureDelegate = null, Action<ConsumerBuilder<TKey, TValue>> builderConfig = null, int maxDegreeOfParallelism = 1)
             where THandler: IKafkaMessageHandler<TKey, TValue>
         {
             hostBuilder.ConfigureServices(
-                (hostCtx, container) =>
+                (__, container) =>
                 {
                     container.AddOptions<KafkaListenerSettings>();
-                    container.Configure(configureDelegate);
+                    if (configureDelegate != null)
+                    {
+                        container.Configure(configureDelegate);
+                    }
                     container.Add(new ServiceDescriptor(typeof(IKafkaMessageHandler<TKey, TValue>), typeof(THandler), ServiceLifetime.Scoped));
 
                     container.AddSingleton<IHostedService>(sp =>
@@ -99,7 +102,7 @@ namespace Microsoft.Extensions.Hosting
 
                         var consumer = builder.Build();
 
-                        return new KafkaListenerService<TKey, TValue>(sp, consumer, kafkaConfig.Topics, logger);
+                        return new KafkaListenerService<TKey, TValue>(sp, consumer, kafkaConfig.Topics, maxDegreeOfParallelism, logger);
                     });
                 });
 
