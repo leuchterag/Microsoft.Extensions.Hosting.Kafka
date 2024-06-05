@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Generic.Kafka.Ho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Generic.Kafka.Hosting.CustomHandle", "samples\Extensions.Generic.Kafka.Hosting.CustomHandle\Extensions.Generic.Kafka.Hosting.CustomHandle.csproj", "{B9F14410-40AB-4E8E-ADFB-A5FF1B4638E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.Generic.Kafka.Hosting,ParallelProcessing", "src\Extensions.Generic.Kafka.Hosting,ParallelProcessing\Extensions.Generic.Kafka.Hosting,ParallelProcessing.csproj", "{AA9CC249-04E3-4AAF-B6A9-2A84C6F1A0BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.Generic.Kafka.Hosting.ParallelProcessing", "samples\Extensions.Generic.Kafka.Hosting.ParallelProcessing\Extensions.Generic.Kafka.Hosting.ParallelProcessing.csproj", "{AA9CC249-04E3-4AAF-B6A9-2A84C6F1A0BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
